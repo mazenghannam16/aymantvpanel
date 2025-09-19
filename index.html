@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض البلاغات - AYMAN TV</title>
+    <style>
+        body{font-family:'Cairo',sans-serif;background-color:#121212;color:#e0e0e0;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center}.container{width:90%;max-width:1000px;background-color:#1e1e1e;padding:25px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.5);margin-bottom:20px}h1,h2{color:#fff;text-align:center;border-bottom:2px solid #333;padding-bottom:10px}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #333;padding:12px;text-align:right}th{background-color:#007bff;color:#fff}td.message{max-width:400px;word-wrap:break-word;}a.back-link{margin-bottom:20px;display:inline-block;padding:10px 20px;background-color:#6c757d;color:#fff;text-decoration:none;border-radius:5px;align-self:flex-start}a.back-link:hover{background-color:#5a6268}.actions button{width:auto;padding:8px 12px;font-size:14px;margin:0 5px;border:none;border-radius:6px;cursor:pointer}.btn-delete{background-color:#dc3545;color:#fff}.btn-delete:hover{background-color:#c82333}
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">العودة للرئيسية</a>
+    <h1>عرض البلاغات</h1>
+
+    <div class="container">
+        <table id="reportsTable">
+            <thead>
+                <tr>
+                    <th>القسم</th>
+                    <th>نص البلاغ</th>
+                    <th>الوقت والتاريخ</th>
+                    <th>الحالة</th>
+                    <th>إجراء</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // نفس إعدادات الربط
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLJFcW7u6RNgfqEDpX03QLYn9h_Qcytt8",
+            authDomain: "ayman-tv-app.firebaseapp.com",
+            databaseURL: "https://ayman-tv-app-default-rtdb.firebaseio.com",
+            projectId: "ayman-tv-app",
+            storageBucket: "ayman-tv-app.firebasestorage.app",
+            messagingSenderId: "928578407858",
+            appId: "1:928578407858:web:7395e2aaea84ee04dde8ab"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const reportsRef = database.ref('ayman_tv/reports');
+
+        // دالة لتحميل وعرض البلاغات
+        function loadReports() {
+            const tableBody = document.getElementById('reportsTable').querySelector('tbody');
+            
+            // on('value') => يستمع لأي تغيير ويحدث الجدول تلقائيًا
+            reportsRef.on('value', (snapshot) => {
+                tableBody.innerHTML = ''; // تفريغ الجدول قبل عرض البيانات الجديدة
+                if (!snapshot.exists()) {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `<td colspan="5" style="text-align: center;">لا توجد بلاغات حاليًا</td>`;
+                    return;
+                }
+                
+                snapshot.forEach((childSnapshot) => {
+                    const reportId = childSnapshot.key;
+                    const reportData = childSnapshot.val();
+                    
+                    // تحويل التاريخ لصيغة مقروءة
+                    const formattedDate = new Date(reportData.timestamp).toLocaleString('ar-EG');
+                    
+                    const row = tableBody.insertRow(0); // إضافة البلاغات الجديدة في الأعلى
+                    row.innerHTML = `
+                        <td>${reportData.categoryName}</td>
+                        <td class="message">${reportData.message}</td>
+                        <td>${formattedDate}</td>
+                        <td>${reportData.status}</td>
+                        <td class="actions">
+                            <button class="btn-delete" onclick="deleteReport('${reportId}')">حذف</button>
+                        </td>
+                    `;
+                });
+            });
+        }
+        
+        // دالة لحذف بلاغ معين
+        function deleteReport(reportId) {
+            if (confirm('هل أنت متأكد من حذف هذا البلاغ؟')) {
+                reportsRef.child(reportId).remove()
+                    .then(() => {
+                        alert('تم حذف البلاغ بنجاح!');
+                    })
+                    .catch((error) => {
+                        alert('فشل الحذف: ' + error.message);
+                    });
+            }
+        }
+        
+        // بدء تحميل البلاغات عند فتح الصفحة
+        window.onload = loadReports;
+    </script>
+</body>
+</html>
