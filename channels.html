@@ -21,33 +21,32 @@
         }
 
         .container {
-            width: 90%;
-            max-width: 800px;
+            width: 95%;
+            max-width: 900px;
             background-color: #0d1b2a;
             padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 6px 20px rgba(0,0,0,.6);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,.7);
             margin-bottom: 20px;
         }
 
-        h1, h2 {
+        h1, h2, h3 {
             color: #fff;
             text-align: center;
             border-bottom: 2px solid #1b263b;
             padding-bottom: 10px;
         }
 
-        input[type=text],
-        input[type=number],
-        input[type=url] {
+        input[type=text], input[type=url] {
             width: 100%;
-            padding: 12px;
-            margin: 8px 0;
+            padding: 14px;
+            margin: 10px 0;
             box-sizing: border-box;
             background-color: #1b263b;
             border: 1px solid #444;
-            border-radius: 8px;
-            color: #e0e0e0;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
         }
 
         button, a.btn {
@@ -56,15 +55,16 @@
             padding: 14px 20px;
             margin: 10px 0;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
-            width: 100%;
             font-size: 16px;
             font-weight: 700;
-            transition: background-color .3s, transform .2s;
+            transition: all .3s ease;
             text-decoration: none;
-            display: inline-block;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         button:hover, a.btn:hover {
@@ -76,7 +76,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
         }
 
@@ -92,8 +92,8 @@
         }
 
         td img {
-            max-width: 50px;
-            border-radius: 8px;
+            max-width: 60px;
+            border-radius: 10px;
             background-color: #fff;
         }
 
@@ -102,10 +102,10 @@
             padding: 8px 12px;
             font-size: 14px;
             margin: 0 5px;
-            border-radius: 6px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
         .btn-delete {
@@ -122,7 +122,7 @@
             padding: 10px 20px;
             background-color: #6c757d;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 10px;
             color: #fff;
             display: flex;
             align-items: center;
@@ -131,6 +131,11 @@
 
         a.back-link:hover {
             background-color: #5a6268;
+        }
+
+        @media(max-width:600px){
+            input[type=text], input[type=url], button, a.btn { width: 95%; font-size: 14px; }
+            td img { max-width: 45px; }
         }
     </style>
 </head>
@@ -180,36 +185,44 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // الحصول على ID واسم القسم من رابط الصفحة
         const params = new URLSearchParams(window.location.search);
         const categoryId = params.get('id');
-        const categoryName = decodeURIComponent(params.get('name'));
+        const categoryName = decodeURIComponent(params.get('name') || '');
+        if(!categoryId){
+            alert('خطأ: لا يوجد ID للقسم في الرابط');
+        }
 
         document.getElementById('categoryTitle').innerText += `"${categoryName}"`;
         const channelsRef = database.ref(`ayman_tv/channels/${categoryId}`);
 
-        // إضافة قناة جديدة
         const addChannelForm = document.getElementById('addChannelForm');
         addChannelForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const name = document.getElementById('channelName').value;
-            const logoUrl = document.getElementById('channelLogoUrl').value;
-            const streamUrl = document.getElementById('channelStreamUrl').value;
+            const name = document.getElementById('channelName').value.trim();
+            const logoUrl = document.getElementById('channelLogoUrl').value.trim();
+            const streamUrl = document.getElementById('channelStreamUrl').value.trim();
 
-            channelsRef.push().set({ name, logoUrl, streamUrl }).then(() => {
-                alert('تم إضافة القناة بنجاح!');
-                addChannelForm.reset();
-            }).catch(error => console.error(error));
+            if(!name || !logoUrl || !streamUrl) return alert('جميع الحقول مطلوبة');
+
+            channelsRef.push().set({ name, logoUrl, streamUrl })
+                .then(() => {
+                    alert('تم إضافة القناة بنجاح!');
+                    addChannelForm.reset();
+                })
+                .catch(error => console.error(error));
         });
 
-        // عرض القنوات
         function loadChannels() {
             const tableBody = document.getElementById('channelsTable').querySelector('tbody');
-            channelsRef.on('value', (snapshot) => {
+            channelsRef.on('value', snapshot => {
                 tableBody.innerHTML = '';
-                snapshot.forEach((childSnapshot) => {
-                    const channelId = childSnapshot.key;
-                    const channelData = childSnapshot.val();
+                if(!snapshot.exists()){
+                    tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center">لا توجد قنوات حالياً</td></tr>`;
+                    return;
+                }
+                snapshot.forEach(child => {
+                    const channelId = child.key;
+                    const channelData = child.val();
                     const row = tableBody.insertRow();
                     row.innerHTML = `
                         <td><img src="${channelData.logoUrl}" alt="logo"></td>
@@ -223,16 +236,15 @@
                 });
             });
         }
-        
-        // حذف قناة
-        function deleteChannel(channelId) {
-            if (confirm('هل أنت متأكد من حذف هذه القناة؟')) {
-                database.ref(\`ayman_tv/channels/\${categoryId}/\${channelId}\`).remove()
-                .then(() => alert('تم حذف القناة بنجاح!'))
-                .catch(error => alert('فشل الحذف: ' + error.message));
+
+        function deleteChannel(channelId){
+            if(confirm('هل أنت متأكد من حذف هذه القناة؟')){
+                channelsRef.child(channelId).remove()
+                    .then(()=> alert('تم حذف القناة بنجاح!'))
+                    .catch(err=> alert('فشل الحذف: '+err.message));
             }
         }
-        
+
         window.onload = loadChannels;
     </script>
 </body>
