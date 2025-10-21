@@ -4,14 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إدارة القنوات - AYMAN TV</title>
-    <!-- خط وأيقونات -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;400&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <style>
+        :root {
+            --primary-bg: #011025;
+            --container-bg: #0d1b2a;
+            --input-bg: #1b263b;
+            --accent-color: #007bff;
+            --delete-color: #dc3545;
+            --edit-color: #ffc107;
+            --edit-text: #000;
+        }
+
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: #011025;
+            background-color: var(--primary-bg);
             color: #e0e0e0;
             margin: 0;
             padding: 20px;
@@ -23,7 +32,7 @@
         .container {
             width: 95%;
             max-width: 900px;
-            background-color: #0d1b2a;
+            background-color: var(--container-bg);
             padding: 25px;
             border-radius: 20px;
             box-shadow: 0 8px 25px rgba(0,0,0,.7);
@@ -33,8 +42,11 @@
         h1, h2, h3 {
             color: #fff;
             text-align: center;
-            border-bottom: 2px solid #1b263b;
+            border-bottom: 2px solid var(--input-bg);
             padding-bottom: 10px;
+        }
+        h1 {
+             margin-bottom: 30px;
         }
 
         input[type=text], input[type=url] {
@@ -42,7 +54,7 @@
             padding: 14px;
             margin: 10px 0;
             box-sizing: border-box;
-            background-color: #1b263b;
+            background-color: var(--input-bg);
             border: 1px solid #444;
             border-radius: 12px;
             color: #fff;
@@ -50,7 +62,7 @@
         }
 
         button, a.btn {
-            background-color: #007bff;
+            background-color: var(--accent-color);
             color: #fff;
             padding: 14px 20px;
             margin: 10px 0;
@@ -81,19 +93,21 @@
         }
 
         th, td {
-            border: 1px solid #1b263b;
+            border: 1px solid var(--input-bg);
             padding: 12px;
             text-align: right;
         }
 
         th {
-            background-color: #007bff;
+            background-color: var(--accent-color);
             color: #fff;
         }
 
         td img {
             max-width: 60px;
-            border-radius: 10px;
+            height: 40px; /* لضمان شكل مستطيل أو مربع واضح */
+            object-fit: contain; /* للحفاظ على نسبة اللوجو */
+            border-radius: 6px; /* لإزالة الدائرة */
             background-color: #fff;
         }
 
@@ -103,18 +117,18 @@
             font-size: 14px;
             margin: 0 5px;
             border-radius: 8px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 4px;
         }
 
-        .btn-delete {
-            background-color: #dc3545;
-        }
+        .btn-delete { background-color: var(--delete-color); }
+        .btn-delete:hover { background-color: #c82333; }
+        
+        /* زر التعديل الجديد */
+        .btn-edit { background-color: var(--edit-color); color: var(--edit-text); }
+        .btn-edit:hover { background-color: #e0a800; }
 
-        .btn-delete:hover {
-            background-color: #c82333;
-        }
 
         a.back-link {
             margin-bottom: 20px;
@@ -129,18 +143,34 @@
             gap: 6px;
         }
 
-        a.back-link:hover {
-            background-color: #5a6268;
+        a.back-link:hover { background-color: #5a6268; }
+        
+        /* Modal Style */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
 
-        @media(max-width:600px){
-            input[type=text], input[type=url], button, a.btn { width: 95%; font-size: 14px; }
-            td img { max-width: 45px; }
+        .modal-content {
+            background-color: var(--container-bg);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
         }
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-link">
+    <a href="categories.html" class="back-link">
         <span class="material-icons">arrow_back</span> العودة للأقسام
     </a>
 
@@ -170,9 +200,30 @@
         </table>
     </div>
 
+    <div id="editChannelModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>تعديل بيانات القناة</h3>
+            <form id="editChannelForm">
+                <input type="hidden" id="editChannelId">
+                <input type="text" id="editChannelName" placeholder="اسم القناة" required>
+                <input type="url" id="editChannelLogoUrl" placeholder="رابط لوجو القناة" required>
+                <input type="url" id="editChannelStreamUrl" placeholder="رابط بث القناة" required>
+                <button type="submit" style="background-color: var(--edit-color); color: var(--edit-text);">
+                    <span class="material-icons">save</span> حفظ التعديلات
+                </button>
+                <button type="button" onclick="document.getElementById('editChannelModal').style.display='none';" style="background-color: var(--delete-color);">
+                    <span class="material-icons">close</span> إلغاء
+                </button>
+            </form>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script>
+        // ======================================================
+        // إعدادات Firebase
+        // ======================================================
         const firebaseConfig = {
             apiKey: "AIzaSyDLJFcW7u6RNgfqEDpX03QLYn9h_Qcytt8",
             authDomain: "ayman-tv-app.firebaseapp.com",
@@ -185,16 +236,24 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // جلب ID واسم القسم من الرابط
         const params = new URLSearchParams(window.location.search);
         const categoryId = params.get('id');
         const categoryName = decodeURIComponent(params.get('name') || '');
+        
         if(!categoryId){
             alert('خطأ: لا يوجد ID للقسم في الرابط');
+            document.getElementById('categoryTitle').innerText = 'خطأ في جلب بيانات القسم';
+        } else {
+             document.getElementById('categoryTitle').innerText += `"${categoryName}"`;
         }
-
-        document.getElementById('categoryTitle').innerText += `"${categoryName}"`;
+        
         const channelsRef = database.ref(`ayman_tv/channels/${categoryId}`);
+        const tableBody = document.getElementById('channelsTable').querySelector('tbody');
 
+        // ======================================================
+        // 1. منطق إضافة قناة جديدة
+        // ======================================================
         const addChannelForm = document.getElementById('addChannelForm');
         addChannelForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -206,18 +265,20 @@
 
             channelsRef.push().set({ name, logoUrl, streamUrl })
                 .then(() => {
-                    alert('تم إضافة القناة بنجاح!');
+                    alert('✅ تم إضافة القناة بنجاح!');
                     addChannelForm.reset();
                 })
-                .catch(error => console.error(error));
+                .catch(error => alert('❌ فشل الإضافة: ' + error.message));
         });
 
+        // ======================================================
+        // 2. منطق عرض القنوات
+        // ======================================================
         function loadChannels() {
-            const tableBody = document.getElementById('channelsTable').querySelector('tbody');
             channelsRef.on('value', snapshot => {
                 tableBody.innerHTML = '';
                 if(!snapshot.exists()){
-                    tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center">لا توجد قنوات حالياً</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 20px;">لا توجد قنوات حالياً في هذا القسم.</td></tr>`;
                     return;
                 }
                 snapshot.forEach(child => {
@@ -228,6 +289,9 @@
                         <td><img src="${channelData.logoUrl}" alt="logo"></td>
                         <td>${channelData.name}</td>
                         <td class="actions">
+                            <button class="btn-edit" onclick="editChannel('${channelId}')">
+                                <span class="material-icons">edit</span> تعديل
+                            </button>
                             <button class="btn-delete" onclick="deleteChannel('${channelId}')">
                                 <span class="material-icons">delete</span> حذف
                             </button>
@@ -237,13 +301,58 @@
             });
         }
 
-        function deleteChannel(channelId){
-            if(confirm('هل أنت متأكد من حذف هذه القناة؟')){
+        // ======================================================
+        // 3. منطق حذف القناة (مُفعل)
+        // ======================================================
+        window.deleteChannel = function(channelId){
+            if(confirm('⚠️ هل أنت متأكد من حذف هذه القناة؟')){
                 channelsRef.child(channelId).remove()
-                    .then(()=> alert('تم حذف القناة بنجاح!'))
-                    .catch(err=> alert('فشل الحذف: '+err.message));
+                    .then(()=> alert('✅ تم حذف القناة بنجاح!'))
+                    .catch(err=> alert('❌ فشل الحذف: '+err.message));
             }
         }
+        
+        // ======================================================
+        // 4. منطق تعديل القناة (مُفعل)
+        // ======================================================
+        const editChannelModal = document.getElementById('editChannelModal');
+        
+        window.editChannel = function(channelId) {
+            channelsRef.child(channelId).once('value').then(snapshot => {
+                const data = snapshot.val();
+                if(data) {
+                    document.getElementById('editChannelId').value = channelId;
+                    document.getElementById('editChannelName').value = data.name;
+                    document.getElementById('editChannelLogoUrl').value = data.logoUrl;
+                    document.getElementById('editChannelStreamUrl').value = data.streamUrl;
+                    editChannelModal.style.display = 'flex';
+                }
+            }).catch(error => alert('❌ فشل جلب بيانات القناة: ' + error.message));
+        }
+
+        const editChannelForm = document.getElementById('editChannelForm');
+        editChannelForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const channelId = document.getElementById('editChannelId').value;
+            
+            const updatedData = {
+                name: document.getElementById('editChannelName').value.trim(),
+                logoUrl: document.getElementById('editChannelLogoUrl').value.trim(),
+                streamUrl: document.getElementById('editChannelStreamUrl').value.trim()
+            };
+
+            if(!updatedData.name || !updatedData.logoUrl || !updatedData.streamUrl) {
+                alert('جميع حقول التعديل مطلوبة');
+                return;
+            }
+
+            channelsRef.child(channelId).update(updatedData)
+                .then(() => {
+                    alert('✅ تم حفظ تعديلات القناة بنجاح!');
+                    editChannelModal.style.display = 'none';
+                })
+                .catch(error => alert('❌ فشل حفظ التعديلات: ' + error.message));
+        });
 
         window.onload = loadChannels;
     </script>
