@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم AYMAN TV - إدارة السلايدر</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons-Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #0d1b2a; 
+            --secondary-bg: #1b263b; 
+            --accent-color: #3a86ff; 
+            --accent-hover: #3373dc; 
+            --text-color: #e0e1dd;
+            --border-color: #415a77; 
+            --danger-color: #e63946; 
+            --success-color: #2a9d8f;
+            --edit-color: #f7b731;
+        }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: var(--primary-bg); 
+            color: var(--text-color); 
+            overflow-x: hidden;
+            /* أصبح الجسم هو الحاوية الرئيسية */
+            min-height: 100vh;
+        }
+
+        /* تم إزالة جميع كلاسات الشريط الجانبي (sidebar, sidebar-nav, etc.) */
+
+        .main-container {
+            /* تم تعديل هذا ليصبح الحاوية الرئيسية للمحتوى */
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* توسيط المحتوى أفقياً */
+        }
+        
+        .content { 
+            /* لضمان تحديد عرض أقصى للمحتوى في الشاشات الكبيرة */
+            width: 100%;
+            max-width: 1200px;
+            padding: 30px 0;
+        }
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .content-header h1 { 
+            font-size: 32px; 
+            color: #fff;
+            padding: 10px 0;
+        }
+        .page-content.active { display: block; }
+        .card { 
+            background-color: var(--secondary-bg); 
+            padding: 25px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+            margin-bottom: 30px; /* زيادة التباعد بين البطاقات */
+        }
+        
+        /* عناصر النموذج */
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 8px 0; 
+            background-color: var(--primary-bg); 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            color: var(--text-color); 
+            font-family: 'Cairo', sans-serif; 
+            font-size: 16px; 
+        }
+        button { 
+            background: linear-gradient(45deg, var(--accent-color), var(--accent-hover)); 
+            color: white; 
+            padding: 12px 20px; 
+            margin: 10px 0; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 700; 
+            width: 100%; 
+            transition: transform 0.2s; 
+        }
+        button:hover { transform: scale(1.02); }
+        
+        /* تصميم الجدول */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        }
+        th, td { 
+            border: 1px solid var(--border-color); 
+            padding: 12px; 
+            text-align: right; 
+        }
+        th { background-color: var(--accent-color); }
+        td img { 
+            max-width: 80px; 
+            border-radius: 5px; 
+            height: 50px; 
+            object-fit: cover; 
+        }
+        .actions button { 
+            width: auto; 
+            padding: 6px 10px; 
+            font-size: 14px; 
+            margin: 0 5px; 
+        }
+        .btn-delete { background: var(--danger-color); }
+        .btn-edit { background: var(--edit-color); }
+        
+        /* Overlay للتعديل */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center;
+            align-items: center; z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            width: 90%; max-width: 600px; padding: 30px;
+            background: var(--secondary-bg); border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <main class="content">
+            <div class="content-header">
+                <h1>لوحة تحكم AYMAN TV - إدارة السلايدر</h1>
+            </div>
+            
+            <div id="slider" class="page-content active">
+                
+                <div class="card">
+                    <h2>إضافة شريحة جديدة</h2>
+                    <form id="addSlideForm">
+                        <input type="text" id="slideTitle" placeholder="عنوان الشريحة" required>
+                        <input type="url" id="slideImageUrl" placeholder="رابط صورة الشريحة (URL)" required>
+                        <input type="text" id="slideButtonText" placeholder="النص على الزر" required>
+                        
+                        <label for="slideActionType" style="display:block; margin-top: 15px; margin-bottom: 5px;">نوع الإجراء:</label>
+                        <select id="slideActionType">
+                            <option value="url">رابط خارجي</option>
+                            <option value="category">فتح قسم (Category)</option>
+                        </select>
+                        
+                        <input type="url" id="slideActionUrl" placeholder="الرابط الخارجي (https://...)" required>
+                        <select id="slideActionCategory" style="display:none;"></select>
+                        
+                        <button type="submit">إضافة الشريحة</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>الشرائح الحالية</h2>
+                    <table id="slidesTable">
+                        <thead>
+                            <tr>
+                                <th>الصورة</th>
+                                <th>العنوان</th>
+                                <th>الإجراء</th>
+                                <th>خيارات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="editModalOverlay">
+        <div class="modal-content">
+            <h2>تعديل الشريحة</h2>
+            <form id="editSlideForm">
+                <input type="hidden" id="editSlideId">
+                <input type="text" id="editSlideTitle" placeholder="عنوان الشريحة" required>
+                <input type="url" id="editSlideImageUrl" placeholder="رابط صورة الشريحة (URL)" required>
+                <input type="text" id="editSlideButtonText" placeholder="النص على الزر" required>
+                
+                <label for="editSlideActionType" style="display:block; margin-top: 15px; margin-bottom: 5px;">نوع الإجراء:</label>
+                <select id="editSlideActionType">
+                    <option value="url">رابط خارجي</option>
+                    <option value="category">فتح قسم (Category)</option>
+                </select>
+                
+                <input type="url" id="editSlideActionUrl" placeholder="الرابط الخارجي (https://...)">
+                <select id="editSlideActionCategory" style="display:none;"></select>
+                
+                <button type="submit" style="background: var(--edit-color);">حفظ التعديلات</button>
+                <button type="button" onclick="document.getElementById('editModalOverlay').style.display='none';" style="background: var(--danger-color);">إلغاء</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+        // --- Firebase Config (استبدل هذه الإعدادات ببياناتك الفعلية) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLJFcW7u6RNgfqEDpX03QLYn9h_Qcytt8",
+            databaseURL: "https://ayman-tv-app-default-rtdb.firebaseio.com",
+            projectId: "ayman-tv-app",
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // مسار البيانات الأساسي للسلايدر والقسم
+        const SLIDER_PATH = 'ayman_tv/slider';
+        const CATEGORIES_PATH = 'ayman_tv/categories';
+        const sliderRef = database.ref(SLIDER_PATH);
+        const categoriesRef = database.ref(CATEGORIES_PATH);
+
+        // --- DOM Elements ---
+        const addSlideForm = document.getElementById('addSlideForm');
+        const slidesTableBody = document.getElementById('slidesTable').querySelector('tbody');
+        const editModalOverlay = document.getElementById('editModalOverlay');
+        const editSlideForm = document.getElementById('editSlideForm');
+        
+        // عناصر نموذج الإضافة
+        const addActionTypeSelect = document.getElementById('slideActionType');
+        const addActionUrlInput = document.getElementById('slideActionUrl');
+        const addActionCategorySelect = document.getElementById('slideActionCategory');
+        
+        // عناصر نموذج التعديل
+        const editActionTypeSelect = document.getElementById('editSlideActionType');
+        const editActionUrlInput = document.getElementById('editSlideActionUrl');
+        const editActionCategorySelect = document.getElementById('editSlideActionCategory');
+
+
+        // ======================================================
+        // وظائف مساعدة لتبديل حقول الإدخال
+        // ======================================================
+
+        function setupActionToggle(typeSelect, urlInput, categorySelect) {
+            const toggle = () => {
+                const isUrl = typeSelect.value === 'url';
+                urlInput.style.display = isUrl ? 'block' : 'none';
+                categorySelect.style.display = isUrl ? 'none' : 'block';
+                // URL input is required if type is 'url', Category is required otherwise
+                urlInput.required = isUrl;
+                categorySelect.required = !isUrl; 
+            };
+            typeSelect.addEventListener('change', toggle);
+            toggle(); // Set initial state
+        }
+
+        // ======================================================
+        // 1. منطق الإضافة
+        // ======================================================
+
+        setupActionToggle(addActionTypeSelect, addActionUrlInput, addActionCategorySelect);
+
+        addSlideForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const actionValue = addActionTypeSelect.value === 'url' ? addActionUrlInput.value : addActionCategorySelect.value;
+            
+            sliderRef.push().set({
+                title: document.getElementById('slideTitle').value,
+                imageUrl: document.getElementById('slideImageUrl').value,
+                buttonText: document.getElementById('slideButtonText').value,
+                actionType: addActionTypeSelect.value,
+                actionValue: actionValue
+            }).then(() => {
+                alert('تمت إضافة الشريحة بنجاح! 🎉');
+                addSlideForm.reset();
+                setupActionToggle(addActionTypeSelect, addActionUrlInput, addActionCategorySelect); // Reset toggle state
+            }).catch(error => {
+                alert("حدث خطأ أثناء الإضافة: " + error.message);
+            });
+        });
+
+        // ======================================================
+        // 2. منطق العرض والحذف
+        // ======================================================
+
+        sliderRef.on('value', snap => {
+            slidesTableBody.innerHTML = '';
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    const slideId = child.key;
+                    const slideData = child.val();
+                    const row = slidesTableBody.insertRow();
+                    
+                    let actionDisplay = slideData.actionType === 'url' 
+                        ? `رابط: <a href="${slideData.actionValue}" target="_blank">${slideData.buttonText}</a>`
+                        : `قسم ID: <strong>${slideData.actionValue}</strong> (الزر: ${slideData.buttonText})`;
+
+                    row.innerHTML = `
+                        <td><img src="${slideData.imageUrl}" alt="صورة الشريحة"></td>
+                        <td>${slideData.title}</td>
+                        <td>${actionDisplay}</td>
+                        <td class="actions">
+                            <button class="btn-edit" onclick="openEditModal('${slideId}')">تعديل</button>
+                            <button class="btn-delete" onclick="deleteSlide('${slideId}')">حذف</button>
+                        </td>
+                    `;
+                });
+            } else {
+                const row = slidesTableBody.insertRow();
+                row.innerHTML = `<td colspan="4" style="text-align: center;">لا توجد شرائح حالياً.</td>`;
+            }
+        });
+        
+        // دالة الحذف (تصبح عامة لتعمل مع onclick)
+        window.deleteSlide = function(slideId) {
+            if (confirm('هل أنت متأكد من حذف هذه الشريحة؟')) {
+                sliderRef.child(slideId).remove()
+                .then(() => alert('تم الحذف بنجاح!'))
+                .catch(error => alert("حدث خطأ أثناء الحذف: " + error.message));
+            }
+        }
+
+        // ======================================================
+        // 3. منطق التعديل (Modal)
+        // ======================================================
+        
+        setupActionToggle(editActionTypeSelect, editActionUrlInput, editActionCategorySelect);
+
+        // دالة فتح نموذج التعديل وتعبئته بالبيانات
+        window.openEditModal = function(slideId) {
+            sliderRef.child(slideId).once('value', snap => {
+                const data = snap.val();
+                if (data) {
+                    document.getElementById('editSlideId').value = slideId;
+                    document.getElementById('editSlideTitle').value = data.title;
+                    document.getElementById('editSlideImageUrl').value = data.imageUrl;
+                    document.getElementById('editSlideButtonText').value = data.buttonText;
+                    editActionTypeSelect.value = data.actionType;
+                    
+                    // تعبئة حقل القيمة حسب نوع الإجراء
+                    if (data.actionType === 'url') {
+                        editActionUrlInput.value = data.actionValue || ''; // التأكد من وجود قيمة
+                        editActionCategorySelect.value = '';
+                    } else {
+                        editActionCategorySelect.value = data.actionValue || '';
+                        editActionUrlInput.value = '';
+                    }
+                    
+                    // تحديث حالة حقول الإدخال المخفية/الظاهرة
+                    editActionTypeSelect.dispatchEvent(new Event('change'));
+
+                    editModalOverlay.style.display = 'flex';
+                }
+            });
+        };
+
+        // معالج إرسال نموذج التعديل
+        editSlideForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const slideId = document.getElementById('editSlideId').value;
+            const actionType = editActionTypeSelect.value;
+            
+            const updatedData = {
+                title: document.getElementById('editSlideTitle').value,
+                imageUrl: document.getElementById('editSlideImageUrl').value,
+                buttonText: document.getElementById('editSlideButtonText').value,
+                actionType: actionType,
+                actionValue: actionType === 'url' ? editActionUrlInput.value : editActionCategorySelect.value
+            };
+
+            sliderRef.child(slideId).update(updatedData)
+            .then(() => {
+                alert('تم حفظ التعديلات بنجاح! 👍');
+                editModalOverlay.style.display = 'none'; // إغلاق النافذة
+            })
+            .catch(error => {
+                alert("حدث خطأ أثناء التعديل: " + error.message);
+            });
+        });
+
+        // ======================================================
+        // 4. تعبئة قائمة الأقسام (لكلا النموذجين)
+        // ======================================================
+        
+        categoriesRef.on('value', snap => {
+            addActionCategorySelect.innerHTML = '';
+            editActionCategorySelect.innerHTML = '';
+
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    const optionAdd = new Option(child.val().name, child.key);
+                    const optionEdit = new Option(child.val().name, child.key);
+                    
+                    addActionCategorySelect.appendChild(optionAdd);
+                    editActionCategorySelect.appendChild(optionEdit);
+                });
+                addActionCategorySelect.disabled = false;
+                editActionCategorySelect.disabled = false;
+            } else {
+                const noOption = new Option('لا توجد أقسام متاحة', '');
+                addActionCategorySelect.appendChild(noOption);
+                editActionCategorySelect.appendChild(noOption.cloneNode(true));
+                addActionCategorySelect.disabled = true;
+                editActionCategorySelect.disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>
