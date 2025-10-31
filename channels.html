@@ -1,376 +1,376 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة القنوات - AYMAN TV</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;400&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة القنوات - AYMAN TV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-    <style>
-        :root {
-            --primary-bg: #011025;
-            --container-bg: #0d1b2a;
-            --input-bg: #1b263b;
-            --accent-color: #007bff;
-            --delete-color: #dc3545;
-            --edit-color: #ffc107;
-            --edit-text: #000;
-        }
+    <style>
+        :root {
+            --primary-bg: #011025;
+            --container-bg: #0d1b2a;
+            --input-bg: #1b263b;
+            --accent-color: #007bff;
+            --delete-color: #dc3545;
+            --edit-color: #ffc107;
+            --edit-text: #000;
+        }
 
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: var(--primary-bg);
-            color: #e0e0e0;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--primary-bg);
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        .container {
-            width: 95%;
-            max-width: 900px;
-            background-color: var(--container-bg);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0,0,0,.7);
-            margin-bottom: 20px;
-        }
+        .container {
+            width: 95%;
+            max-width: 900px;
+            background-color: var(--container-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,.7);
+            margin-bottom: 20px;
+        }
 
-        h1, h2, h3 {
-            color: #fff;
-            text-align: center;
-            border-bottom: 2px solid var(--input-bg);
-            padding-bottom: 10px;
-        }
-        h1 {
-            margin-bottom: 30px;
-        }
+        h1, h2, h3 {
+            color: #fff;
+            text-align: center;
+            border-bottom: 2px solid var(--input-bg);
+            padding-bottom: 10px;
+        }
+        h1 {
+            margin-bottom: 30px;
+        }
 
-        input[type=text], input[type=url], input[type=number] { /* 👈 تم إضافة input[type=number] */
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            box-sizing: border-box;
-            background-color: var(--input-bg);
-            border: 1px solid #444;
-            border-radius: 12px;
-            color: #fff;
-            font-size: 16px;
-        }
+        input[type=text], input[type=url], input[type=number] {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            background-color: var(--input-bg);
+            border: 1px solid #444;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+        }
 
-        button, a.btn {
-            background-color: var(--accent-color);
-            color: #fff;
-            padding: 14px 20px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 700;
-            transition: all .3s ease;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+        button, a.btn {
+            background-color: var(--accent-color);
+            color: #fff;
+            padding: 14px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all .3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
 
-        button:hover, a.btn:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-        }
+        button:hover, a.btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            border-radius: 12px;
-            overflow: hidden;
-        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
 
-        th, td {
-            border: 1px solid var(--input-bg);
-            padding: 12px;
-            text-align: right;
-        }
+        th, td {
+            border: 1px solid var(--input-bg);
+            padding: 12px;
+            text-align: right;
+        }
 
-        th {
-            background-color: var(--accent-color);
-            color: #fff;
-        }
+        th {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
 
-        td img {
-            max-width: 60px;
-            height: 40px;
-            object-fit: contain;
-            border-radius: 6px;
-            background-color: #fff;
-        }
+        td img {
+            max-width: 60px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 6px;
+            background-color: #fff;
+        }
 
-        .actions button {
-            width: auto;
-            padding: 8px 12px;
-            font-size: 14px;
-            margin: 0 5px;
-            border-radius: 8px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
+        .actions button {
+            width: auto;
+            padding: 8px 12px;
+            font-size: 14px;
+            margin: 0 5px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
 
-        .btn-delete { background-color: var(--delete-color); }
-        .btn-delete:hover { background-color: #c82333; }
-        
-        /* زر التعديل الجديد */
-        .btn-edit { background-color: var(--edit-color); color: var(--edit-text); }
-        .btn-edit:hover { background-color: #e0a800; }
+        .btn-delete { background-color: var(--delete-color); }
+        .btn-delete:hover { background-color: #c82333; }
+        
+        /* زر التعديل الجديد */
+        .btn-edit { background-color: var(--edit-color); color: var(--edit-text); }
+        .btn-edit:hover { background-color: #e0a800; }
 
 
-        a.back-link {
-            margin-bottom: 20px;
-            width: auto;
-            padding: 10px 20px;
-            background-color: #6c757d;
-            text-decoration: none;
-            border-radius: 10px;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        a.back-link {
+            margin-bottom: 20px;
+            width: auto;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            text-decoration: none;
+            border-radius: 10px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-        a.back-link:hover { background-color: #5a6268; }
-        
-        /* Modal Style */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
+        a.back-link:hover { background-color: #5a6268; }
+        
+        /* Modal Style */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
 
-        .modal-content {
-            background-color: var(--container-bg);
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 450px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
-        }
-    </style>
+        .modal-content {
+            background-color: var(--container-bg);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+        }
+    </style>
 </head>
 <body>
-    <a href="categories.html" class="back-link">
-        <span class="material-icons">arrow_back</span> العودة للأقسام
-    </a>
+    <a href="categories.html" class="back-link">
+        <span class="material-icons">arrow_back</span> العودة للأقسام
+    </a>
 
-    <h1 id="categoryTitle">إدارة قنوات: </h1>
+    <h1 id="categoryTitle">إدارة قنوات: </h1>
 
-    <div class="container">
-        <h2>إضافة قناة جديدة</h2>
-        <form id="addChannelForm">
-            <input type="text" id="channelName" placeholder="اسم القناة" required>
-            <input type="url" id="channelLogoUrl" placeholder="رابط لوجو القناة" required>
-            <input type="url" id="channelStreamUrl" placeholder="رابط بث القناة" required>
-            <input type="number" id="channelPosition" placeholder="ترتيب القناة (رقم)" value="0" min="0" required> 
-            
-            <button type="submit">
-                <span class="material-icons">add_circle</span> إضافة قناة
-            </button>
-        </form>
+    <div class="container">
+        <h2>إضافة قناة جديدة</h2>
+        <form id="addChannelForm">
+            <input type="text" id="channelName" placeholder="اسم القناة" required>
+            <input type="url" id="channelLogoUrl" placeholder="رابط لوجو القناة" required>
+            <input type="url" id="channelStreamUrl" placeholder="رابط بث القناة" required>
+            <input type="number" id="channelPosition" placeholder="ترتيب القناة (رقم)" value="0" min="0" required> 
+            
+            <button type="submit">
+                <span class="material-icons">add_circle</span> إضافة قناة
+            </button>
+        </form>
 
-        <h3>القنوات الحالية في القسم</h3>
-        <table id="channelsTable">
-            <thead>
-                <tr>
-                    <th>الترتيب</th> <th>اللوجو</th>
-                    <th>اسم القناة</th>
-                    <th>إجراءات</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+        <h3>القنوات الحالية في القسم</h3>
+        <table id="channelsTable">
+            <thead>
+                <tr>
+                    <th>الترتيب</th> <th>اللوجو</th>
+                    <th>اسم القناة</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
-    <div id="editChannelModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3>تعديل بيانات القناة</h3>
-            <form id="editChannelForm">
-                <input type="hidden" id="editChannelId">
-                <input type="text" id="editChannelName" placeholder="اسم القناة" required>
-                <input type="url" id="editChannelLogoUrl" placeholder="رابط لوجو القناة" required>
-                <input type="url" id="editChannelStreamUrl" placeholder="رابط بث القناة" required>
-                <input type="number" id="editChannelPosition" placeholder="ترتيب القناة (رقم)" min="0" required> 
-                
-                <button type="submit" style="background-color: var(--edit-color); color: var(--edit-text);">
-                    <span class="material-icons">save</span> حفظ التعديلات
-                </button>
-                <button type="button" onclick="document.getElementById('editChannelModal').style.display='none';" style="background-color: var(--delete-color);">
-                    <span class="material-icons">close</span> إلغاء
-                </button>
-            </form>
-        </div>
-    </div>
+    <div id="editChannelModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>تعديل بيانات القناة</h3>
+            <form id="editChannelForm">
+                <input type="hidden" id="editChannelId">
+                <input type="text" id="editChannelName" placeholder="اسم القناة" required>
+                <input type="url" id="editChannelLogoUrl" placeholder="رابط لوجو القناة" required>
+                <input type="url" id="editChannelStreamUrl" placeholder="رابط بث القناة" required>
+                <input type="number" id="editChannelPosition" placeholder="ترتيب القناة (رقم)" min="0" required> 
+                
+                <button type="submit" style="background-color: var(--edit-color); color: var(--edit-text);">
+                    <span class="material-icons">save</span> حفظ التعديلات
+                </button>
+                <button type="button" onclick="document.getElementById('editChannelModal').style.display='none';" style="background-color: var(--delete-color);">
+                    <span class="material-icons">close</span> إلغاء
+                </button>
+            </form>
+        </div>
+    </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script>
-        // ======================================================
-        // إعدادات Firebase
-        // ======================================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyDLJFcW7u6RNgfqEDpX03QLYn9h_Qcytt8",
-            authDomain: "ayman-tv-app.firebaseapp.com",
-            databaseURL: "https://ayman-tv-app-default-rtdb.firebaseio.com",
-            projectId: "ayman-tv-app",
-            storageBucket: "ayman-tv-app.firebasestorage.app",
-            messagingSenderId: "928578407858",
-            appId: "1:928578407858:web:7395e2aaea84ee04dde8ab"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+        // ======================================================
+        // إعدادات Firebase
+        // ======================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLJFcW7u6RNgfqEDpX03QLYn9h_Qcytt8",
+            authDomain: "ayman-tv-app.firebaseapp.com",
+            databaseURL: "https://ayman-tv-app-default-rtdb.firebaseio.com",
+            projectId: "ayman-tv-app",
+            storageBucket: "ayman-tv-app.firebasestorage.app",
+            messagingSenderId: "928578407858",
+            appId: "1:928578407858:web:7395e2aaea84ee04dde8ab"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-        // جلب ID واسم القسم من الرابط
-        const params = new URLSearchParams(window.location.search);
-        const categoryId = params.get('id');
-        const categoryName = decodeURIComponent(params.get('name') || '');
-        
-        if(!categoryId){
-            alert('خطأ: لا يوجد ID للقسم في الرابط');
-            document.getElementById('categoryTitle').innerText = 'خطأ في جلب بيانات القسم';
-        } else {
-            document.getElementById('categoryTitle').innerText += `"${categoryName}"`;
-        }
-        
-        // 🚨 تحديد المرجع وإضافة query للفرز حسب الترتيب (position)
-        const channelsRef = database.ref(`ayman_tv/channels/${categoryId}`);
-        const tableBody = document.getElementById('channelsTable').querySelector('tbody');
+        // جلب ID واسم القسم من الرابط
+        const params = new URLSearchParams(window.location.search);
+        const categoryId = params.get('id');
+        const categoryName = decodeURIComponent(params.get('name') || '');
+        
+        if(!categoryId){
+            alert('خطأ: لا يوجد ID للقسم في الرابط');
+            document.getElementById('categoryTitle').innerText = 'خطأ في جلب بيانات القسم';
+        } else {
+            document.getElementById('categoryTitle').innerText += `"${categoryName}"`;
+        }
+        
+        // المرجع إلى قنوات القسم
+        const channelsRef = database.ref(`ayman_tv/channels/${categoryId}`);
+        const tableBody = document.getElementById('channelsTable').querySelector('tbody');
 
-        // ======================================================
-        // 1. منطق إضافة قناة جديدة (تحديث)
-        // ======================================================
-        const addChannelForm = document.getElementById('addChannelForm');
-        addChannelForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('channelName').value.trim();
-            const logoUrl = document.getElementById('channelLogoUrl').value.trim();
-            const streamUrl = document.getElementById('channelStreamUrl').value.trim();
-            // 🚨 جلب قيمة الترتيب وتحويلها إلى رقم
-            const position = parseInt(document.getElementById('channelPosition').value) || 0; 
+        // ======================================================
+        // 1. منطق إضافة قناة جديدة (مُعدل)
+        // ======================================================
+        const addChannelForm = document.getElementById('addChannelForm');
+        addChannelForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('channelName').value.trim();
+            const logoUrl = document.getElementById('channelLogoUrl').value.trim();
+            const streamUrl = document.getElementById('channelStreamUrl').value.trim();
+            // 🚨 جلب قيمة الترتيب وتحويلها إلى رقم
+            const position = parseInt(document.getElementById('channelPosition').value) || 0; 
 
-            if(!name || !logoUrl || !streamUrl) return alert('جميع الحقول مطلوبة');
+            if(!name || !logoUrl || !streamUrl) return alert('جميع الحقول مطلوبة');
 
-            // 🚨 حفظ حقل الترتيب position مع البيانات
-            channelsRef.push().set({ name, logoUrl, streamUrl, position }) 
-                .then(() => {
-                    alert('✅ تم إضافة القناة بنجاح!');
-                    addChannelForm.reset();
-                    document.getElementById('channelPosition').value = 0; // إعادة القيمة الافتراضية
-                })
-                .catch(error => alert('❌ فشل الإضافة: ' + error.message));
-        });
+            // 🚨 حفظ حقل الترتيب position مع البيانات
+            channelsRef.push().set({ name, logoUrl, streamUrl, position }) 
+                .then(() => {
+                    alert('✅ تم إضافة القناة بنجاح!');
+                    addChannelForm.reset();
+                    document.getElementById('channelPosition').value = 0; // إعادة القيمة الافتراضية
+                })
+                .catch(error => alert('❌ فشل الإضافة: ' + error.message));
+        });
 
-        // ======================================================
-        // 2. منطق عرض القنوات (تحديث)
-        // ======================================================
-        function loadChannels() {
-            // 🚨 فرز القنوات حسب حقل 'position' ثم حسب المفتاح 'key' لضمان الترتيب
-            channelsRef.orderByChild('position').on('value', snapshot => { 
-                tableBody.innerHTML = '';
-                if(!snapshot.exists()){
-                    tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">لا توجد قنوات حالياً في هذا القسم.</td></tr>`;
-                    return;
-                }
-                snapshot.forEach(child => {
-                    const channelId = child.key;
-                    const channelData = child.val();
-                    const row = tableBody.insertRow();
-                    row.innerHTML = `
-                        <td>${channelData.position !== undefined ? channelData.position : '0'}</td> <td><img src="${channelData.logoUrl}" alt="logo"></td>
-                        <td>${channelData.name}</td>
-                        <td class="actions">
-                            <button class="btn-edit" onclick="editChannel('${channelId}')">
-                                <span class="material-icons">edit</span> تعديل
-                            </button>
-                            <button class="btn-delete" onclick="deleteChannel('${channelId}')">
-                                <span class="material-icons">delete</span> حذف
-                            </button>
-                        </td>
-                    `;
-                });
-            });
-        }
+        // ======================================================
+        // 2. منطق عرض القنوات (مُعدل)
+        // ======================================================
+        function loadChannels() {
+            // 🚨 الفرز حسب حقل 'position' لضمان الترتيب من 1 فأكبر (تصاعدي)
+            channelsRef.orderByChild('position').on('value', snapshot => { 
+                tableBody.innerHTML = '';
+                if(!snapshot.exists()){
+                    tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">لا توجد قنوات حالياً في هذا القسم.</td></tr>`;
+                    return;
+                }
+                snapshot.forEach(child => {
+                    const channelId = child.key;
+                    const channelData = child.val();
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${channelData.position !== undefined ? channelData.position : '0'}</td> <td><img src="${channelData.logoUrl}" alt="logo"></td>
+                        <td>${channelData.name}</td>
+                        <td class="actions">
+                            <button class="btn-edit" onclick="editChannel('${channelId}')">
+                                <span class="material-icons">edit</span> تعديل
+                            </button>
+                            <button class="btn-delete" onclick="deleteChannel('${channelId}')">
+                                <span class="material-icons">delete</span> حذف
+                            </button>
+                        </td>
+                    `;
+                });
+            });
+        }
 
-        // ======================================================
-        // 3. منطق حذف القناة (بدون تغيير)
-        // ======================================================
-        window.deleteChannel = function(channelId){
-            if(confirm('⚠️ هل أنت متأكد من حذف هذه القناة؟')){
-                channelsRef.child(channelId).remove()
-                    .then(()=> alert('✅ تم حذف القناة بنجاح!'))
-                    .catch(err=> alert('❌ فشل الحذف: '+err.message));
-            }
-        }
-        
-        // ======================================================
-        // 4. منطق تعديل القناة (تحديث)
-        // ======================================================
-        const editChannelModal = document.getElementById('editChannelModal');
-        
-        window.editChannel = function(channelId) {
-            channelsRef.child(channelId).once('value').then(snapshot => {
-                const data = snapshot.val();
-                if(data) {
-                    document.getElementById('editChannelId').value = channelId;
-                    document.getElementById('editChannelName').value = data.name;
-                    document.getElementById('editChannelLogoUrl').value = data.logoUrl;
-                    document.getElementById('editChannelStreamUrl').value = data.streamUrl;
-                    // 🚨 جلب قيمة الترتيب لعرضها في نموذج التعديل
-                    document.getElementById('editChannelPosition').value = data.position !== undefined ? data.position : 0; 
-                    editChannelModal.style.display = 'flex';
-                }
-            }).catch(error => alert('❌ فشل جلب بيانات القناة: ' + error.message));
-        }
+        // ======================================================
+        // 3. منطق حذف القناة (بدون تغيير)
+        // ======================================================
+        window.deleteChannel = function(channelId){
+            if(confirm('⚠️ هل أنت متأكد من حذف هذه القناة؟')){
+                channelsRef.child(channelId).remove()
+                    .then(()=> alert('✅ تم حذف القناة بنجاح!'))
+                    .catch(err=> alert('❌ فشل الحذف: '+err.message));
+            }
+        }
+        
+        // ======================================================
+        // 4. منطق تعديل القناة (مُعدل)
+        // ======================================================
+        const editChannelModal = document.getElementById('editChannelModal');
+        
+        window.editChannel = function(channelId) {
+            channelsRef.child(channelId).once('value').then(snapshot => {
+                const data = snapshot.val();
+                if(data) {
+                    document.getElementById('editChannelId').value = channelId;
+                    document.getElementById('editChannelName').value = data.name;
+                    document.getElementById('editChannelLogoUrl').value = data.logoUrl;
+                    document.getElementById('editChannelStreamUrl').value = data.streamUrl;
+                    // 🚨 جلب قيمة الترتيب لعرضها في نموذج التعديل
+                    document.getElementById('editChannelPosition').value = data.position !== undefined ? data.position : 0; 
+                    editChannelModal.style.display = 'flex';
+                }
+            }).catch(error => alert('❌ فشل جلب بيانات القناة: ' + error.message));
+        }
 
-        const editChannelForm = document.getElementById('editChannelForm');
-        editChannelForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const channelId = document.getElementById('editChannelId').value;
-            
-            // 🚨 جلب قيمة الترتيب الجديدة من نموذج التعديل
-            const newPosition = parseInt(document.getElementById('editChannelPosition').value) || 0; 
-            
-            const updatedData = {
-                name: document.getElementById('editChannelName').value.trim(),
-                logoUrl: document.getElementById('editChannelLogoUrl').value.trim(),
-                streamUrl: document.getElementById('editChannelStreamUrl').value.trim(),
-                position: newPosition // 🚨 إرسال قيمة الترتيب الجديدة
-            };
+        const editChannelForm = document.getElementById('editChannelForm');
+        editChannelForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const channelId = document.getElementById('editChannelId').value;
+            
+            // 🚨 جلب قيمة الترتيب الجديدة من نموذج التعديل
+            const newPosition = parseInt(document.getElementById('editChannelPosition').value) || 0; 
+            
+            const updatedData = {
+                name: document.getElementById('editChannelName').value.trim(),
+                logoUrl: document.getElementById('editChannelLogoUrl').value.trim(),
+                streamUrl: document.getElementById('editChannelStreamUrl').value.trim(),
+                position: newPosition // 🚨 إرسال قيمة الترتيب الجديدة
+            };
 
-            if(!updatedData.name || !updatedData.logoUrl || !updatedData.streamUrl) {
-                alert('جميع حقول التعديل مطلوبة');
-                return;
-            }
+            if(!updatedData.name || !updatedData.logoUrl || !updatedData.streamUrl) {
+                alert('جميع حقول التعديل مطلوبة');
+                return;
+            }
 
-            channelsRef.child(channelId).update(updatedData)
-                .then(() => {
-                    alert('✅ تم حفظ تعديلات القناة بنجاح!');
-                    editChannelModal.style.display = 'none';
-                })
-                .catch(error => alert('❌ فشل حفظ التعديلات: ' + error.message));
-        });
+            channelsRef.child(channelId).update(updatedData)
+                .then(() => {
+                    alert('✅ تم حفظ تعديلات القناة بنجاح!');
+                    editChannelModal.style.display = 'none';
+                })
+                .catch(error => alert('❌ فشل حفظ التعديلات: ' + error.message));
+        });
 
-        window.onload = loadChannels;
-    </script>
+        window.onload = loadChannels;
+    </script>
 </body>
 </html>
