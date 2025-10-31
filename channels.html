@@ -46,10 +46,10 @@
             padding-bottom: 10px;
         }
         h1 {
-             margin-bottom: 30px;
+            margin-bottom: 30px;
         }
 
-        input[type=text], input[type=url] {
+        input[type=text], input[type=url], input[type=number] { /* 👈 تم إضافة input[type=number] */
             width: 100%;
             padding: 14px;
             margin: 10px 0;
@@ -105,9 +105,9 @@
 
         td img {
             max-width: 60px;
-            height: 40px; /* لضمان شكل مستطيل أو مربع واضح */
-            object-fit: contain; /* للحفاظ على نسبة اللوجو */
-            border-radius: 6px; /* لإزالة الدائرة */
+            height: 40px;
+            object-fit: contain;
+            border-radius: 6px;
             background-color: #fff;
         }
 
@@ -182,6 +182,8 @@
             <input type="text" id="channelName" placeholder="اسم القناة" required>
             <input type="url" id="channelLogoUrl" placeholder="رابط لوجو القناة" required>
             <input type="url" id="channelStreamUrl" placeholder="رابط بث القناة" required>
+            <input type="number" id="channelPosition" placeholder="ترتيب القناة (رقم)" value="0" min="0" required> 
+            
             <button type="submit">
                 <span class="material-icons">add_circle</span> إضافة قناة
             </button>
@@ -191,7 +193,7 @@
         <table id="channelsTable">
             <thead>
                 <tr>
-                    <th>اللوجو</th>
+                    <th>الترتيب</th> <th>اللوجو</th>
                     <th>اسم القناة</th>
                     <th>إجراءات</th>
                 </tr>
@@ -208,6 +210,8 @@
                 <input type="text" id="editChannelName" placeholder="اسم القناة" required>
                 <input type="url" id="editChannelLogoUrl" placeholder="رابط لوجو القناة" required>
                 <input type="url" id="editChannelStreamUrl" placeholder="رابط بث القناة" required>
+                <input type="number" id="editChannelPosition" placeholder="ترتيب القناة (رقم)" min="0" required> 
+                
                 <button type="submit" style="background-color: var(--edit-color); color: var(--edit-text);">
                     <span class="material-icons">save</span> حفظ التعديلات
                 </button>
@@ -245,14 +249,15 @@
             alert('خطأ: لا يوجد ID للقسم في الرابط');
             document.getElementById('categoryTitle').innerText = 'خطأ في جلب بيانات القسم';
         } else {
-             document.getElementById('categoryTitle').innerText += `"${categoryName}"`;
+            document.getElementById('categoryTitle').innerText += `"${categoryName}"`;
         }
         
+        // 🚨 تحديد المرجع وإضافة query للفرز حسب الترتيب (position)
         const channelsRef = database.ref(`ayman_tv/channels/${categoryId}`);
         const tableBody = document.getElementById('channelsTable').querySelector('tbody');
 
         // ======================================================
-        // 1. منطق إضافة قناة جديدة
+        // 1. منطق إضافة قناة جديدة (تحديث)
         // ======================================================
         const addChannelForm = document.getElementById('addChannelForm');
         addChannelForm.addEventListener('submit', (e) => {
@@ -260,25 +265,30 @@
             const name = document.getElementById('channelName').value.trim();
             const logoUrl = document.getElementById('channelLogoUrl').value.trim();
             const streamUrl = document.getElementById('channelStreamUrl').value.trim();
+            // 🚨 جلب قيمة الترتيب وتحويلها إلى رقم
+            const position = parseInt(document.getElementById('channelPosition').value) || 0; 
 
             if(!name || !logoUrl || !streamUrl) return alert('جميع الحقول مطلوبة');
 
-            channelsRef.push().set({ name, logoUrl, streamUrl })
+            // 🚨 حفظ حقل الترتيب position مع البيانات
+            channelsRef.push().set({ name, logoUrl, streamUrl, position }) 
                 .then(() => {
                     alert('✅ تم إضافة القناة بنجاح!');
                     addChannelForm.reset();
+                    document.getElementById('channelPosition').value = 0; // إعادة القيمة الافتراضية
                 })
                 .catch(error => alert('❌ فشل الإضافة: ' + error.message));
         });
 
         // ======================================================
-        // 2. منطق عرض القنوات
+        // 2. منطق عرض القنوات (تحديث)
         // ======================================================
         function loadChannels() {
-            channelsRef.on('value', snapshot => {
+            // 🚨 فرز القنوات حسب حقل 'position' ثم حسب المفتاح 'key' لضمان الترتيب
+            channelsRef.orderByChild('position').on('value', snapshot => { 
                 tableBody.innerHTML = '';
                 if(!snapshot.exists()){
-                    tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 20px;">لا توجد قنوات حالياً في هذا القسم.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">لا توجد قنوات حالياً في هذا القسم.</td></tr>`;
                     return;
                 }
                 snapshot.forEach(child => {
@@ -286,7 +296,7 @@
                     const channelData = child.val();
                     const row = tableBody.insertRow();
                     row.innerHTML = `
-                        <td><img src="${channelData.logoUrl}" alt="logo"></td>
+                        <td>${channelData.position !== undefined ? channelData.position : '0'}</td> <td><img src="${channelData.logoUrl}" alt="logo"></td>
                         <td>${channelData.name}</td>
                         <td class="actions">
                             <button class="btn-edit" onclick="editChannel('${channelId}')">
@@ -302,7 +312,7 @@
         }
 
         // ======================================================
-        // 3. منطق حذف القناة (مُفعل)
+        // 3. منطق حذف القناة (بدون تغيير)
         // ======================================================
         window.deleteChannel = function(channelId){
             if(confirm('⚠️ هل أنت متأكد من حذف هذه القناة؟')){
@@ -313,7 +323,7 @@
         }
         
         // ======================================================
-        // 4. منطق تعديل القناة (مُفعل)
+        // 4. منطق تعديل القناة (تحديث)
         // ======================================================
         const editChannelModal = document.getElementById('editChannelModal');
         
@@ -325,6 +335,8 @@
                     document.getElementById('editChannelName').value = data.name;
                     document.getElementById('editChannelLogoUrl').value = data.logoUrl;
                     document.getElementById('editChannelStreamUrl').value = data.streamUrl;
+                    // 🚨 جلب قيمة الترتيب لعرضها في نموذج التعديل
+                    document.getElementById('editChannelPosition').value = data.position !== undefined ? data.position : 0; 
                     editChannelModal.style.display = 'flex';
                 }
             }).catch(error => alert('❌ فشل جلب بيانات القناة: ' + error.message));
@@ -335,10 +347,14 @@
             e.preventDefault();
             const channelId = document.getElementById('editChannelId').value;
             
+            // 🚨 جلب قيمة الترتيب الجديدة من نموذج التعديل
+            const newPosition = parseInt(document.getElementById('editChannelPosition').value) || 0; 
+            
             const updatedData = {
                 name: document.getElementById('editChannelName').value.trim(),
                 logoUrl: document.getElementById('editChannelLogoUrl').value.trim(),
-                streamUrl: document.getElementById('editChannelStreamUrl').value.trim()
+                streamUrl: document.getElementById('editChannelStreamUrl').value.trim(),
+                position: newPosition // 🚨 إرسال قيمة الترتيب الجديدة
             };
 
             if(!updatedData.name || !updatedData.logoUrl || !updatedData.streamUrl) {
